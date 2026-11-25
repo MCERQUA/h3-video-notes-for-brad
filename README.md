@@ -1,39 +1,25 @@
-# Local video generation with MiniMax H3: what we actually know
+# H3 (MiniMax H3) video workflows: reference
 
-A short, honest reference written 2026-11-24 for Brad and his agent. It is not a full workflow pack:
-we have not yet logged detailed settings, and this repo says so rather than guessing.
+Reviewed and extended 2026-11-25 by the render node that actually produces H3 video.
 
-## What H3 is, and why not Wan
+## Two caveats (read before relying on or publishing anything here)
+1. **Licence output-display exclusions:** the H3 weights' licence (dated 2026-08-02) excludes the EU, UK, South Korea and
+   the USA, and covers displaying OUTPUTS there, not just running the weights. See H3-RULES.md §9; read the primary text.
+2. **Numbers come from one 24 GB CUDA card.** AMD GPUs are UNMEASURED for H3; treat all speed/VRAM figures as
+   not transferable until tested.
 
-- "H3" is **MiniMax H3**, our team's standing local video-generation model. **Hunyuan Video 1.5** is
-  the tested alternative.
-- **Wan is ruled out.** Mike's words (2026-10-25): *"wan video is crap and we should not use it."*
-  This is a standing team decision, not a benchmark result. Do not use or recommend Wan.
-- Images are a separate model, not video: **FLUX.3 Image Klein**, 5.6B params, int8 about 5.8 GB
-  (about 11 GB with its Qwen3-VL 4B text encoder).
+## Start here
+1. `H3-RULES.md`: the real working reference. Two modes (pinned image-to-video vs reference-to-video), ComfyUI wiring
+   (node names, dot-namespaced inputs, frame counts, 20-step base graph, text-encoder choices and VRAM), dialogue/voice
+   rules, silence/sound, continuity, verification, speed (offload- vs compute-bound), dead ends. Each rule is labelled
+   PROVEN / MEASURED n=k / DOCUMENTED / COMMUNITY.
+2. **Licence, read before you render anything for anyone (H3-RULES.md §9):** the weights' licence (dated 2026-08-02)
+   excludes the EU, UK, South Korea and the USA, and it covers displaying OUTPUTS there, not just running the weights.
+   Testing is one thing; production output is another. Check where you and your audience are, and read the primary text.
 
-## Confirmed
-
-- 2026-11-22: a member of our voice room said Mike runs MiniMax H3 locally for video and called it
-  the most productive video model they had seen in that setup. Secondhand praise, no numbers.
-- 2026-10-30: H3 formalized as our video model, Hunyuan 1.5 as the tested alternative, Wan ruled out.
-  Policy, not a workflow writeup.
-- General tip, not H3-specific: on multi-GPU rigs, models that overflow VRAM run far slower
-  (more than half the speed was lost in one test). Leave VRAM headroom before tuning video settings.
-
-## Not yet documented
-
-No ComfyUI workflow JSON, node graphs, sampler/step/resolution settings, LoRA names or hard
-performance numbers (seconds per frame, VRAM used) are written down here for H3 or Hunyuan 1.5.
-Anything more specific would be a guess from public knowledge, not our tested experience.
-
-## Contents
-
-- `README.md`: this file.
-- `SCRIPT-WRITING.md`: what we have for video script writing, and what we do not.
-
-## Key
-
-- **Confirmed**: cited from our team's own notes or a named experience.
-- **Policy**: a standing team rule, binding for us, not evidence about quality.
-- **Not yet documented**: anything we have not written down.
+## What this package does NOT contain (honest)
+- No ComfyUI JSON export. The base graph is described in H3-RULES.md §2 (text encoder -> GGUF UNet -> SigmaShift -> H3
+  node -> res_multistep/simple, 20 steps); an actual workflow file is a separate hand-over from the render node.
+- No script-writing methodology beyond what `SCRIPT-WRITING.md` says; the render node has a fuller internal skill that has not been sanitized for sharing.
+- Hardware: figures are from a single 24 GB card with offload. AMD GPUs are untested for H3: the
+  nodes, GGUF path and quant ops are CUDA-world assumptions. Treat as unmeasured.
